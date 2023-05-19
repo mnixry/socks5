@@ -245,6 +245,9 @@ class UDPSession(BaseSession):
             logger.debug(f"UDP Closed {transport.get_extra_info('sockname')}")
 
 
-class WebSocketSession(ConnectSession):
+class AbstractWebSocketSession(ConnectSession):
+    proxy_url: str
+    """Upstream Worker URL, e.g. wss://114.514.worker.dev/"""
+
     async def connect_remote(self, host: str, port: int):
-        return WebSocket(host, port)
+        return WebSocket(host, port, self.proxy_url)

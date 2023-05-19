@@ -145,9 +145,7 @@ class WebSocket(Socket):
     connection: Optional[WebSocketClientProtocol] = None
     stopped = False
 
-    def __init__(
-        self, host: str, port: int, ws_proxy: str = "wss://ssh.shizuku.workers.dev/"
-    ) -> None:
+    def __init__(self, host: str, port: int, ws_proxy: str) -> None:
         self.ws = websockets_connect(f"{ws_proxy}?host={host}&port={port}")
         self.reader = asyncio.StreamReader()
 
@@ -176,7 +174,7 @@ class WebSocket(Socket):
     async def send(self, data: bytes) -> int:
         if self.connection is None:
             await self.start_signal.wait()
-            
+
         assert self.connection is not None, "WebSocket connection is None"
         await self.connection.send(data)
         return len(data)
