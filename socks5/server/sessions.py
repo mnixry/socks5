@@ -8,7 +8,7 @@ from socket import AF_INET, AF_INET6, inet_ntop, inet_pton
 
 from socks5.types import Socket, AddressType
 from socks5.values import Status, Atyp
-from socks5.utils import judge_atyp, onlyfirst, TCPSocket
+from socks5.utils import WebSocket, judge_atyp, onlyfirst, TCPSocket
 
 from ._socks5 import create_replication
 
@@ -213,7 +213,9 @@ class UDPSession(BaseSession):
                 port = randint(1025, 65535)
                 return await asyncio.get_event_loop().create_datagram_endpoint(
                     lambda: UDPProtocol(
-                        (self.host, self.port), self.from_local, self.from_remote,
+                        (self.host, self.port),
+                        self.from_local,
+                        self.from_remote,
                     ),
                     (host, port),
                 )
@@ -241,3 +243,8 @@ class UDPSession(BaseSession):
         finally:
             transport.close()
             logger.debug(f"UDP Closed {transport.get_extra_info('sockname')}")
+
+
+class WebSocketSession(ConnectSession):
+    async def connect_remote(self, host: str, port: int):
+        return WebSocket(host, port)
